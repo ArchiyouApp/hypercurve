@@ -41,6 +41,7 @@ mod curve_path_intersection;
 mod curve_region_boolean;
 mod curve_region_trim;
 mod curve_string;
+mod elliptical_arc;
 mod error;
 mod events;
 mod facts;
@@ -206,6 +207,7 @@ pub use curve_string::{
     CurveString2, CurveStringEndpoint2, CurveStringIntersection, CurveStringLinkKind2,
     CurveStringTrimPoint2,
 };
+pub use elliptical_arc::{elliptical_arc_path, elliptical_span, EllipseMap2};
 pub use error::{
     CurveError, CurveOperation2, CurveResult, ExactCurveBlocker, ExactCurveError, ExactCurveResult,
 };
