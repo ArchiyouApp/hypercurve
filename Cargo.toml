@@ -20,8 +20,10 @@ all-features = true
 # a path dependency must resolve even when its feature is off.
 hyperreal = { version = "0.13.1", default-features = false }
 hypersolve = { version = "0.3.1", default-features = false }
-hyperlimit = { version = "0.4.1", default-features = false, features = ["std"], optional = true }
-hypertri = { version = "0.4.1", default-features = false, features = ["earcut"], optional = true }
+hyperlimit = { version = "0.4.1", default-features = false, features = ["std"] }
+# hypertri 0.4.1 is not on crates.io (0.4.0 is the latest published) and only the
+# `triangulation` feature, which meshup never enables, pulls it in.
+hypertri = { version = "0.4", default-features = false, features = ["earcut"], optional = true }
 num = { version = "0.4.3", features = ["num-bigint"] }
 cavalier_contours = { version = "0.7.0", optional = true }
 # Archiyou fork tweak: upstream pins curvo 0.1.91 (-> geo 0.33 -> i_overlay 4.5),
@@ -151,9 +153,6 @@ required-features = ["comparative-benchmarks"]
 name = "pathological_regions"
 harness = false
 
-[patch.crates-io]
-hyperreal = { path = "../hyperreal" }
-hyperlattice = { path = "../hyperlattice" }
-hyperlimit = { path = "../hyperlimit" }
-hypersolve = { path = "../hypersolve" }
-hypertri = { path = "../hypertri" }
+# Archiyou fork tweak: upstream's `[patch.crates-io]` is dropped here. Inside the meshup
+# workspace hypercurve is not the root package, so cargo ignores the section and warns about
+# it on every build; the root manifest carries the same redirects.
