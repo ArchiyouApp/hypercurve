@@ -49221,11 +49221,19 @@ impl BezierAlgebraicCuspChordDerivedPoint2 {
                     policy,
                 )
             }
+            // Archiyou fork tweak: upstream writes this as an `if let` match guard, which is
+            // still nightly-only (rust-lang/rust#51114). `matches!` with its own guard is the
+            // stable spelling of the same test.
             RationalBezierIntersectionPointEvidence2::Similarity(similarity)
-                if let RationalBezierIntersectionPointEvidence2::AlgebraicCuspChordDerived(
-                    source,
-                ) = &similarity.data.source
-                    && self.is_similarity_image_of(source, &similarity.data.transform, policy) =>
+                if matches!(
+                    &similarity.data.source,
+                    RationalBezierIntersectionPointEvidence2::AlgebraicCuspChordDerived(source)
+                        if self.is_similarity_image_of(
+                            source,
+                            &similarity.data.transform,
+                            policy,
+                        )
+                ) =>
             {
                 Classification::Decided(true)
             }
