@@ -499,6 +499,13 @@ fn svg_circular_arc(
     large_arc: bool,
     sweep: bool,
 ) -> SvgResult<Option<CircularArc2>> {
+    // SVG's sweep-flag is 1 for the "positive angle direction", i.e. counter-clockwise in the
+    // coordinate-value plane. `CircularArc2::try_from_center` takes the opposite convention,
+    // `clockwise`, so the flag has to be negated on the way in. Passing it through unchanged
+    // imported every arc as its mirror image: `M0 0 A10 10 0 0 1 20 0` bulged to +y, where the
+    // spec puts it at -y. Both the center selection below and the constructed arc read this,
+    // and they have to agree.
+    let clockwise = !sweep;
     if rx != ry {
         return Err(SvgError::Unsupported(
             "non-circular elliptical path arc".into(),
@@ -550,14 +557,16 @@ fn svg_circular_arc(
         let end_y = end.y() - center.y();
         let cross = start_x * end_y - start_y * end_x;
         let cross_sign = svg_real_sign(&cross);
+        // Positive cross = `end` lies counter-clockwise of `start` the short way round, so a
+        // clockwise traversal is the major arc, and vice versa.
         let is_major = match cross_sign {
             Some(RealSign::Zero) => false,
-            Some(RealSign::Positive) => sweep,
-            Some(RealSign::Negative) => !sweep,
+            Some(RealSign::Positive) => clockwise,
+            Some(RealSign::Negative) => !clockwise,
             None => continue,
         };
         if is_major == large_arc || cross_sign == Some(RealSign::Zero) {
-            return CircularArc2::try_from_center(start, end, center, sweep)
+            return CircularArc2::try_from_center(start, end, center, clockwise)
                 .map(Some)
                 .map_err(svg_geometry_error);
         }
